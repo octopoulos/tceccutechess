@@ -198,7 +198,7 @@ bool Tournament::bergerSchedule() const
 
 bool Tournament::usesBergerSchedule() const
 {
-	return m_bergerSchedule && type() == "round-robin";
+	return m_bergerSchedule && (type() == "round-robin" || type() == "swiss-tcec");
 }
 
 int Tournament::strikes() const
@@ -359,12 +359,16 @@ void Tournament::setReloadEngines(bool enabled)
 	m_reloadEngines = enabled;
 }
 
-void Tournament::setResume(int nextGameNumber, double eng1Score, double eng2Score)
+void Tournament::setResume(int nextGameNumber)
 {
     Q_UNUSED(eng1Score);
     Q_UNUSED(eng2Score);
 	Q_ASSERT(nextGameNumber >= 0);
 	m_resumeGameNumber = nextGameNumber;
+}
+
+void Tournament::addResumeGameResult(int gameNumber, const QString &result)
+{
 }
 
 void Tournament::addPlayer(PlayerBuilder* builder,
@@ -1097,7 +1101,6 @@ void Tournament::start()
 
 	if (m_resumeGameNumber)
 	{
-		//m_finishedGameCount = m_resumeGameNumber - 1;
 		for(int nextGame = m_resumeGameNumber; nextGame; --nextGame)
 		{
 			TournamentPair* pair(nextPair(m_nextGameNumber));

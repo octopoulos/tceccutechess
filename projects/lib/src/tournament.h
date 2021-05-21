@@ -282,7 +282,13 @@ class LIB_EXPORT Tournament : public QObject
 		 * Play will resume after the last completed game. Openings, including
 		 * repeated and randomly chosen openings, will resume as well.
 		 */
-		void setResume(int nextGameNumber, double eng1Score, double eng2Score);
+		void setResume(int nextGameNumber);
+
+		/*!
+		 * Add game result for a resumed tournament
+		 */
+		virtual void addResumeGameResult(int gameNumber, const QString &result);
+
 		/*!
 		 * Sets the tournament to Berger/Schurig scheduling if \a enabled.
 		 */

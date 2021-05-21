@@ -86,6 +86,7 @@ UciEngine::UciEngine(QObject* parent)
 	: ChessEngine(parent),
 	  m_useDirectPv(false),
 	  m_sendOpponentsName(false),
+	  m_sendRatingAdv(false),
 	  m_canPonder(false),
 	  m_ponderState(NotPondering),
 	  m_movesPondered(0),
@@ -153,10 +154,18 @@ void UciEngine::startGame()
 
 	if (m_sendOpponentsName)
 	{
+		QString opRating = opponent()->rating() ?
+				   QString::number(opponent()->rating()) : "none";
 		QString opType = opponent()->isHuman() ? "human" : "computer";
-		QString value = QString("none none %1 %2")
-				.arg(opType, opponent()->name());
+		QString value = QString("none %1 %2 %3")
+				.arg(opRating, opType, opponent()->name());
 		sendOption("UCI_Opponent", value);
+        }
+
+	if (m_sendRatingAdv)
+	{
+		if (opponent()->rating() && rating())
+			sendOption("UCI_RatingAdv", QString::number(rating() - opponent()->rating()));
 	}
 
 	sendPosition();
@@ -766,6 +775,8 @@ void UciEngine::parseLine(const QString& line)
 			addVariantsFromOption(option);
 		else if (option->name() == "UCI_Opponent")
 			m_sendOpponentsName = true;
+		else if (option->name() == "UCI_RatingAdv")
+			m_sendRatingAdv = true;
 		else if (option->name() == "Ponder")
 			m_canPonder = true;
 		else
